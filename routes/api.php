@@ -34,6 +34,10 @@ Route::group([
 ], function () {
     Route::get('profile', [AuthController::class, 'profile']);
     Route::get('logout', [AuthController::class, 'logout']);
+
+    Route::apiResource('books', BookController::class)
+        ->only(['index', 'show', 'store', 'update', 'destroy'])
+        ->middleware('admin'); // Apply admin middleware to all book routes
 });
 
 
