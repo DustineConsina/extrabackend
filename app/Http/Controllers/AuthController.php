@@ -15,13 +15,12 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required',
-            'role' => 'in:user,admin', // Optional but safe validation
+            'password' => 'required|min:6',
+            'role' => 'in:user,admin' // Optional: ensure role is valid
         ]);
 
         $data['password'] = Hash::make($data['password']);
-        $data['role'] = 'user';  // or whatever default role you want
-
+        $data['role'] = $data['role'] ?? 'user'; // Default role if not provided
 
         $user = User::create($data);
 
@@ -29,22 +28,22 @@ class AuthController extends Controller
             'status' => true,
             'message' => 'User created successfully',
             'user' => $user,
-        ]);
+        ], 201);
     }
 
     // ✅ Login API
     public function login(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($credentials)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid credentials'
-            ]);
+            ], 401);
         }
 
         $user = Auth::user();
@@ -54,15 +53,14 @@ class AuthController extends Controller
             'status' => true,
             'message' => 'Login successful',
             'token' => $token,
-            'user' => $user,  
-            'user' => auth()->user(), // This will return the authenticated user
+            'user' => $user,
         ]);
     }
 
     // ✅ Profile API
     public function profile()
     {
-        $user = Auth::user();
+        $user = auth()->user();
 
         return response()->json([
             'status' => true,
@@ -72,13 +70,13 @@ class AuthController extends Controller
     }
 
     // ✅ Logout API
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::logout();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'status' => true,
-            'message' => 'User logged out successfully'
+            'message' => 'User logged out successfully',
         ]);
     }
 }

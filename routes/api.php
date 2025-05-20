@@ -6,41 +6,29 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BookController;
 
+// 📌 Public Routes (No Auth)
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/books', [BookController::class, 'index']); // List books for users
 
-Route::get('/books', [BookController::class, 'index']);
-Route::post('/books/{id}/borrow', [BookController::class, 'borrow']);
-Route::post('/books/{id}/return', [BookController::class, 'return']);
+// 📌 User Routes (Requires Auth)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [AuthController::class, 'profile']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 
+    Route::post('/books/{id}/borrow', [BookController::class, 'borrow']);
+    Route::post('/books/{id}/return', [BookController::class, 'return']);
+});
+
+// 📌 Admin Routes (Requires Auth + Admin)
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/books', [BookController::class, 'index']);       // List all books
-    Route::get('/books/{id}', [BookController::class, 'show']);   // View single book
-    Route::post('/books', [BookController::class, 'store']);      // Create a book
-    Route::put('/books/{id}', [BookController::class, 'update']); // Update a book
-    Route::delete('/books/{id}', [BookController::class, 'destroy']); // Delete
+    // Admin Book Management
+    Route::get('/books', [BookController::class, 'index']);
+    Route::get('/books/{id}', [BookController::class, 'show']);
+    Route::post('/books', [BookController::class, 'store']);
+    Route::put('/books/{id}', [BookController::class, 'update']);
+    Route::delete('/books/{id}', [BookController::class, 'destroy']);
+
+    // Admin User Management
+    Route::get('/users', [UserController::class, 'index']);
 });
-
-
-
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/admin/users', [UserController::class, 'index']);
-});
-
-
-Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
-
-Route::group([
-    'middleware' => ['auth:sanctum'],
-], function () {
-    Route::get('profile', [AuthController::class, 'profile']);
-    Route::get('logout', [AuthController::class, 'logout']);
-
-    Route::apiResource('books', BookController::class)
-        ->only(['index', 'show', 'store', 'update', 'destroy'])
-        ->middleware('admin'); // Apply admin middleware to all book routes
-});
-
-
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
