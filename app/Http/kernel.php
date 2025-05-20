@@ -20,6 +20,12 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\TrustProxies::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        
+            // ...
+            \Fruitcake\Cors\HandleCors::class,
+            // ..
+        
+    
     ];
 
     /**
