@@ -17,7 +17,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://extrabackend-production.up.railway.app'],
+    'allowed_origins' => ['https://iptextra-5d4w.vercel.app'],
 
     'allowed_origins_patterns' => [],
 
