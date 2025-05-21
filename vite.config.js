@@ -10,4 +10,9 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    preview: {
+        host: '0.0.0.0',
+        port: process.env.PORT || 4173,
+        allowedHosts: ['extrabackend-2.onrender.com'],
+    },
 });
