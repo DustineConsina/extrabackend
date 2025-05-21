@@ -125,4 +125,15 @@ class BookController extends Controller
             "message" => "Book deleted successfully",
         ]);
     }
+
+    public function userBooks()
+    {
+        $books = Book::all(); // Fetch all books (or apply filters if needed)
+
+        return response()->json([
+            "status" => true,
+            "message" => "Books retrieved successfully",
+            "data" => $books,
+        ]);
+    }
 }
